@@ -4,6 +4,11 @@ import cookieParser from 'cookie-parser';
 import dotenv from 'dotenv';
 import http from 'http';
 import { Server } from 'socket.io';
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 import authRoutes from './src/routes/auth.js';
 import vehicleRoutes from './src/routes/vehicle.js';
@@ -50,7 +55,7 @@ app.use(cors({
 }));
 
 // Serve uploaded images statically
-app.use('/uploads', express.static('uploads'));
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // Routes
 app.use('/api/auth', authRoutes);
