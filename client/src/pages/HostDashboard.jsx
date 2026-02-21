@@ -1,18 +1,22 @@
 import { useState, useEffect, useContext } from 'react';
 import { AuthContext } from '../contexts/AuthContext';
 import api from '../utils/api';
-import { Car, PlusCircle, IndianRupee } from 'lucide-react';
+import { Car, PlusCircle, Activity } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { io } from 'socket.io-client';
+import { motion, AnimatePresence } from 'framer-motion';
 
 export default function HostDashboard() {
     const [vehicles, setVehicles] = useState([]);
     const [loading, setLoading] = useState(true);
     const [showAddForm, setShowAddForm] = useState(false);
+    const [uploadingImage, setUploadingImage] = useState(false);
+    const [liveAlerts, setLiveAlerts] = useState([]);
     const { user } = useContext(AuthContext);
     const navigate = useNavigate();
 
     const [formData, setFormData] = useState({
-        make: '', model: '', year: '', price_per_day: '', description: '', location_lat: 9.9312, location_lng: 76.2673, image: ''
+        make: '', model: '', year: '', price_per_day: '', description: '', location_lat: 9.9312, location_lng: 76.2673, imageFile: null
     });
 
     useEffect(() => {
@@ -36,101 +40,154 @@ export default function HostDashboard() {
             }
         };
         fetchVehicles();
+
+        // Socket IO Setup
+        const socket = io('http://localhost:5000');
+        socket.on('connect', () => {
+            socket.emit('join_host_room', user.id);
+        });
+
+        socket.on('new_mission', (data) => {
+            setLiveAlerts(prev => [data.message, ...prev]);
+            setTimeout(() => {
+                setLiveAlerts(prev => prev.filter(msg => msg !== data.message));
+            }, 8000);
+        });
+
+        return () => socket.disconnect();
     }, [user, navigate]);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
+            let uploadedUrl = '';
+            if (formData.imageFile) {
+                setUploadingImage(true);
+                const uploadData = new FormData();
+                uploadData.append('image', formData.imageFile);
+                const uploadRes = await api.post('/upload', uploadData, {
+                    headers: { 'Content-Type': 'multipart/form-data' }
+                });
+                uploadedUrl = uploadRes.data.data.url;
+            }
+
             const payload = {
                 ...formData,
-                images: formData.image ? [formData.image] : []
+                images: uploadedUrl ? [uploadedUrl] : []
             };
             const { data } = await api.post('/vehicles', payload);
             const newV = data.data.vehicle;
             newV.images = typeof newV.images === 'string' ? JSON.parse(newV.images) : newV.images;
             setVehicles([...vehicles, newV]);
             setShowAddForm(false);
-            setFormData({ make: '', model: '', year: '', price_per_day: '', description: '', location_lat: 9.9312, location_lng: 76.2673, image: '' });
+            setFormData({ make: '', model: '', year: '', price_per_day: '', description: '', location_lat: 9.9312, location_lng: 76.2673, imageFile: null });
         } catch (err) {
             alert(err.response?.data?.message || 'Failed to add vehicle');
+        } finally {
+            setUploadingImage(false);
         }
     };
 
-    if (loading) return <div className="p-10 text-center text-emerald-600 font-bold">Loading Host Assets...</div>;
+    if (loading) return <div className="min-h-screen flex items-center justify-center text-[#FF00FF] horizon-title text-2xl animate-pulse">BOOTING FESTIVAL UPLINK...</div>;
 
     return (
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
-            <div className="flex justify-between items-center mb-8 border-b pb-4">
-                <h1 className="text-3xl font-extrabold text-gray-900 border-none">My Listings</h1>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 relative min-h-[80vh]">
+
+            {/* Live Alerts Overlay */}
+            <div className="fixed top-24 right-4 z-50 flex flex-col gap-2 pointer-events-none">
+                <AnimatePresence>
+                    {liveAlerts.map((alert, idx) => (
+                        <motion.div
+                            key={idx}
+                            initial={{ x: 100, opacity: 0 }}
+                            animate={{ x: 0, opacity: 1 }}
+                            exit={{ x: 100, opacity: 0 }}
+                            className="bg-black/80 backdrop-blur-md border border-[#00FFFF] p-4 flex items-center gap-3 shadow-[0_0_20px_rgba(0,255,255,0.4)]"
+                        >
+                            <Activity className="text-[#FF00FF] animate-pulse" />
+                            <span className="horizon-title text-white flex-1">{alert}</span>
+                        </motion.div>
+                    ))}
+                </AnimatePresence>
+            </div>
+
+            <div className="flex justify-between items-center mb-8 border-b border-white/20 pb-4">
+                <h1 className="text-4xl horizon-title text-white drop-shadow-[0_0_15px_rgba(255,0,255,0.8)]">MY VEHICLES</h1>
                 <button
                     onClick={() => setShowAddForm(!showAddForm)}
-                    className="flex items-center space-x-2 bg-emerald-600 hover:bg-emerald-700 text-white px-5 py-2.5 rounded-lg font-bold shadow-sm transition-colors"
+                    className="horizon-btn"
                 >
-                    <PlusCircle size={20} />
-                    <span>{showAddForm ? 'Cancel' : 'Add Vehicle'}</span>
+                    <span>{showAddForm ? 'CANCEL' : 'ADD NEW VEHICLE'}</span>
                 </button>
             </div>
 
             {showAddForm && (
-                <div className="mb-10 bg-white p-6 rounded-2xl shadow-lg border border-emerald-100 max-w-3xl">
-                    <h2 className="text-2xl font-bold mb-6 text-emerald-800">List a New Vehicle</h2>
-                    <form onSubmit={handleSubmit} className="grid grid-cols-2 gap-4">
+                <motion.div initial={{ y: -20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} className="mb-10 bg-white/5 backdrop-blur-xl p-8 border border-white/20 max-w-3xl shadow-[0_0_30px_rgba(0,0,0,0.5)]">
+                    <h2 className="text-2xl horizon-title mb-6 text-[#00FFFF]">ADD A NEW VEHICLE</h2>
+                    <form onSubmit={handleSubmit} className="grid grid-cols-2 gap-6">
                         <div>
-                            <label className="block text-sm font-bold text-gray-700 mb-1">Make</label>
-                            <input type="text" required placeholder="e.g., Hyundai" value={formData.make} onChange={e => setFormData({ ...formData, make: e.target.value })} className="w-full border border-gray-300 rounded-lg p-2 focus:ring-emerald-500" />
+                            <label className="block text-sm font-bold text-white/50 mb-1 uppercase tracking-widest">MAKE</label>
+                            <input type="text" required placeholder="NISSAN" value={formData.make} onChange={e => setFormData({ ...formData, make: e.target.value })} className="horizon-input w-full" />
                         </div>
                         <div>
-                            <label className="block text-sm font-bold text-gray-700 mb-1">Model</label>
-                            <input type="text" required placeholder="e.g., i20" value={formData.model} onChange={e => setFormData({ ...formData, model: e.target.value })} className="w-full border border-gray-300 rounded-lg p-2 focus:ring-emerald-500" />
+                            <label className="block text-sm font-bold text-white/50 mb-1 uppercase tracking-widest">MODEL</label>
+                            <input type="text" required placeholder="SKYLINE GT-R" value={formData.model} onChange={e => setFormData({ ...formData, model: e.target.value })} className="horizon-input w-full" />
                         </div>
                         <div>
-                            <label className="block text-sm font-bold text-gray-700 mb-1">Year</label>
-                            <input type="number" required placeholder="2022" value={formData.year} onChange={e => setFormData({ ...formData, year: e.target.value })} className="w-full border border-gray-300 rounded-lg p-2 focus:ring-emerald-500" />
+                            <label className="block text-sm font-bold text-white/50 mb-1 uppercase tracking-widest">YEAR</label>
+                            <input type="number" required placeholder="2024" value={formData.year} onChange={e => setFormData({ ...formData, year: e.target.value })} className="horizon-input w-full" />
                         </div>
                         <div>
-                            <label className="block text-sm font-bold text-gray-700 mb-1">Price per Day (₹)</label>
-                            <input type="number" required placeholder="1200" value={formData.price_per_day} onChange={e => setFormData({ ...formData, price_per_day: e.target.value })} className="w-full border border-gray-300 rounded-lg p-2 focus:ring-emerald-500" />
+                            <label className="block text-sm font-bold text-white/50 mb-1 uppercase tracking-widest">PRICE PER DAY (INR)</label>
+                            <input type="number" required placeholder="1200" value={formData.price_per_day} onChange={e => setFormData({ ...formData, price_per_day: e.target.value })} className="horizon-input w-full" />
                         </div>
                         <div className="col-span-2">
-                            <label className="block text-sm font-bold text-gray-700 mb-1">Image URL</label>
-                            <input type="url" placeholder="https://images.unsplash..." value={formData.image} onChange={e => setFormData({ ...formData, image: e.target.value })} className="w-full border border-gray-300 rounded-lg p-2 focus:ring-emerald-500" />
+                            <label className="block text-sm font-bold text-white/50 mb-1 uppercase tracking-widest">UPLOAD VEHICLE IMAGE</label>
+                            <input type="file" accept="image/*" onChange={e => setFormData({ ...formData, imageFile: e.target.files[0] })} className="w-full text-white file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-bold file:bg-[#FF00FF] file:text-white hover:file:bg-[#00FFFF] hover:file:text-black transition-all cursor-pointer" />
                         </div>
                         <div className="col-span-2">
-                            <label className="block text-sm font-bold text-gray-700 mb-1">Description</label>
-                            <textarea required rows="3" placeholder="Describe your vehicle..." value={formData.description} onChange={e => setFormData({ ...formData, description: e.target.value })} className="w-full border border-gray-300 rounded-lg p-2 focus:ring-emerald-500"></textarea>
+                            <label className="block text-sm font-bold text-white/50 mb-1 uppercase tracking-widest">DESCRIPTION</label>
+                            <textarea required rows="3" placeholder="Describe your vehicle..." value={formData.description} onChange={e => setFormData({ ...formData, description: e.target.value })} className="horizon-input w-full"></textarea>
                         </div>
-                        <div className="col-span-2">
-                            <button type="submit" className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 rounded-lg shadow mt-2">Publish Listing</button>
+                        <div className="col-span-2 mt-4">
+                            <button type="submit" disabled={uploadingImage} className="horizon-btn w-full !block !py-4">
+                                <span>{uploadingImage ? 'UPLOADING...' : 'LIST VEHICLE FORE RENT'}</span>
+                            </button>
                         </div>
                     </form>
-                </div>
+                </motion.div>
             )}
 
             {vehicles.length === 0 && !showAddForm ? (
-                <div className="text-center py-20 bg-gray-50 rounded-2xl border-2 border-dashed border-gray-300">
-                    <Car className="mx-auto h-12 w-12 text-gray-400 mb-4" />
-                    <p className="text-gray-500 text-lg font-medium">You haven't listed any vehicles yet.</p>
+                <div className="text-center py-20 bg-black/30 backdrop-blur-sm border border-white/10">
+                    <Car className="mx-auto h-16 w-16 text-white/20 mb-4" />
+                    <p className="text-white/50 text-xl horizon-title">YOU HAVE NO VEHICLES LISTED.</p>
                 </div>
             ) : (
                 <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
                     {vehicles.map(v => (
-                        <div key={v.id} className="bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-md border border-gray-100 transition-all flex flex-col">
-                            {v.images && v.images.length > 0 && v.images[0] && (
-                                <div className="h-48 overflow-hidden border-b border-gray-100">
-                                    <img src={v.images[0]} alt={v.model} className="w-full h-full object-cover" />
+                        <div key={v.id} className="bg-white/5 border border-white/10 overflow-hidden flex flex-col group hover:border-[#FF00FF] transition-all duration-300">
+                            {v.images && v.images.length > 0 && v.images[0] ? (
+                                <div className="h-48 overflow-hidden border-b border-white/10">
+                                    <img src={v.images[0]} alt={v.model} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                                </div>
+                            ) : (
+                                <div className="h-48 bg-black/50 border-b border-white/10 flex items-center justify-center">
+                                    <span className="horizon-title text-white/20">NO IMAGE</span>
                                 </div>
                             )}
-                            <div className="p-5 flex-1 flex flex-col justify-between">
+                            <div className="p-6 flex-1 flex flex-col justify-between relative">
                                 <div>
-                                    <h3 className="font-bold text-xl text-gray-900 mb-2">{v.make} {v.model} <span className="text-sm font-normal text-gray-500 ml-1">({v.year})</span></h3>
-                                    <div className="flex items-center text-emerald-700 font-bold bg-emerald-50 px-3 py-1.5 rounded-lg w-max mb-4">
-                                        <IndianRupee size={16} className="mr-0.5" />
-                                        {v.price_per_day} / day
+                                    <p className="text-[#00FFFF] font-bold text-xs uppercase tracking-widest mb-1">{v.make}</p>
+                                    <h3 className="horizon-title text-white text-3xl leading-none mb-4">{v.model}</h3>
+
+                                    <div className="inline-block bg-black/50 border border-white/20 px-3 py-1 font-bold text-white text-sm uppercase">
+                                        ₹ {v.price_per_day} <span className="text-[#FF00FF]">/ DAY</span>
                                     </div>
                                 </div>
-                                <div className="flex justify-between items-center text-sm font-medium border-t pt-4 border-gray-100 mt-4">
-                                    <span className="text-emerald-600 bg-emerald-50 px-2 py-1 rounded">Active</span>
-                                    <span className="text-gray-500">Edit listing</span>
+                                <div className="flex justify-between items-center text-xs font-bold uppercase tracking-widest border-t border-white/20 pt-4 mt-6">
+                                    <span className="text-[#00FF00]">ACTIVE LISTING</span>
+                                    <span className="text-white/30 hover:text-white cursor-pointer transition-colors">EDIT LISTING</span>
                                 </div>
                             </div>
                         </div>

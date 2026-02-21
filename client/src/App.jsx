@@ -8,6 +8,7 @@ import Signup from './pages/Signup';
 import VehicleDetail from './pages/VehicleDetail';
 import Dashboard from './pages/Dashboard';
 import HostDashboard from './pages/HostDashboard';
+import Success from './pages/Success';
 import './index.css';
 
 function AnimatedRoutes() {
@@ -21,6 +22,7 @@ function AnimatedRoutes() {
         <Route path="/vehicle/:id" element={<VehicleDetail />} />
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/host" element={<HostDashboard />} />
+        <Route path="/success" element={<Success />} />
       </Routes>
     </AnimatePresence>
   );

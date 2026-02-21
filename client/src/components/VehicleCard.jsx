@@ -56,12 +56,12 @@ export default function VehicleCard({ vehicle }) {
 
                     <div className="flex justify-between items-end mt-4">
                         <div className="flex items-center text-xs font-medium text-white/70 uppercase tracking-widest gap-2">
-                            <MapPin size={14} className="text-[#FF00FF]" /> HORIZON QUARTERS
+                            <MapPin size={14} className="text-[#FF00FF]" /> VEHICLE LOCATION
                         </div>
                         <div className="text-right">
-                            <span className="text-[10px] text-white/50 tracking-wdest uppercase block mb-1">CR Payout</span>
+                            <span className="text-[10px] text-white/50 tracking-wdest uppercase block mb-1">PRICE / DAY</span>
                             <div className="text-2xl horizon-price text-white">
-                                {String(vehicle.price_per_day).padStart(6, '0')} <span className="text-[#00FFFF] text-sm">CR</span>
+                                ₹ {String(vehicle.price_per_day).padStart(4, '0')}
                             </div>
                         </div>
                     </div>

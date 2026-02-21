@@ -30,11 +30,11 @@ export default function Navbar() {
                                     className="horizon-btn text-sm"
                                     style={{ padding: '0.4rem 0.8rem', fontSize: '1rem' }}
                                 >
-                                    <span>{user.role === 'HOST' ? 'TO RENTING' : 'TO FESTIVAL'}</span>
+                                    <span>{user.role === 'HOST' ? 'SWITCH TO RENTING' : 'SWITCH TO HOSTING'}</span>
                                 </button>
                                 {user.role === 'HOST' ? (
                                     <Link to="/host" className="horizon-title text-white hover:text-[#00FFFF] px-2 py-1 relative after:absolute after:bottom-0 after:left-0 after:w-full after:h-[2px] after:bg-[#FF00FF] after:opacity-0 hover:after:opacity-100 after:transition-opacity">
-                                        FESTIVAL HQ
+                                        MY VEHICLES
                                     </Link>
                                 ) : (
                                     <Link to="/dashboard" className="horizon-title text-white hover:text-[#00FFFF] flex items-center gap-1 px-2 py-1 relative after:absolute after:bottom-0 after:left-0 after:w-full after:h-[2px] after:bg-[#FF00FF] after:opacity-0 hover:after:opacity-100 after:transition-opacity">

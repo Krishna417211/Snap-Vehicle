@@ -20,6 +20,24 @@ export const createBooking = async (req, res, next) => {
         const vehicle = await prisma.vehicle.findUnique({ where: { id: parseInt(vehicle_id) } });
         if (!vehicle) return next(new AppError('Vehicle not found', 404));
 
+        // Overlap Validation
+        const overlappingBookings = await prisma.booking.findMany({
+            where: {
+                vehicle_id: parseInt(vehicle_id),
+                status: 'CONFIRMED',
+                start_date: {
+                    lte: end,
+                },
+                end_date: {
+                    gte: start,
+                },
+            },
+        });
+
+        if (overlappingBookings.length > 0) {
+            return next(new AppError('VEHICLE UNAVAILABLE FOR THESE DATES.', 400));
+        }
+
         // Calculate days and total price
         const diffTime = Math.abs(end - start);
         const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
@@ -32,7 +50,7 @@ export const createBooking = async (req, res, next) => {
                 start_date: start,
                 end_date: end,
                 total_price,
-                status: 'CONFIRMED' // Auto confirm for now
+                status: 'PENDING'
             }
         });
 

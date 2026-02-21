@@ -56,17 +56,28 @@ export default function VehicleDetail() {
             navigate('/login');
             return;
         }
-
         setBookingLoading(true);
         setError('');
         try {
-            await api.post('/bookings', { vehicle_id: id, start_date: startDate, end_date: endDate });
-            setBookingSuccess(true);
-            setTimeout(() => {
-                navigate('/dashboard');
-            }, 3000);
+            // Priority 1: Request pending slot
+            const { data } = await api.post('/bookings', {
+                vehicle_id: id,
+                start_date: startDate,
+                end_date: endDate
+            });
+
+            const newBooking = data.data.booking;
+
+            // Priority 2: Request Stripe Secure Payment Session
+            const checkoutRes = await api.post('/checkout/create-session', {
+                booking_id: newBooking.id
+            });
+
+            // Redirect to Stripe checkout
+            window.location.href = checkoutRes.data.data.sessionUrl;
+
         } catch (err) {
-            setError(err.response?.data?.message || 'Failed to complete mission.');
+            setError(err.response?.data?.message || 'Failed to acquire clearance. Vehicle might be booked.');
         } finally {
             setBookingLoading(false);
         }
@@ -116,16 +127,16 @@ export default function VehicleDetail() {
                         transition={{ type: 'spring', damping: 10 }}
                         className="text-6xl md:text-8xl horizon-success text-center px-4"
                     >
-                        NEW EVENT ACQUIRED
+                        NEW BOOKING CONFIRMED
                     </motion.h1>
-                    <p className="text-white/70 tracking-[0.3em] uppercase mt-4">Heading back to Festival HQ...</p>
+                    <p className="text-white/70 tracking-[0.3em] uppercase mt-4">Heading back to Home...</p>
                 </div>
             )}
 
             {/* Nav Back Header */}
             <div className="absolute top-4 left-4 z-50">
                 <button onClick={() => navigate(-1)} className="text-white hover:text-[#00FFFF] px-4 py-2 bg-black/30 backdrop-blur-md border border-white/20 flex items-center gap-2 uppercase font-bold tracking-widest transition-colors rounded-full text-sm">
-                    <ArrowLeft size={18} /> BACK TO FESTIVAL
+                    <ArrowLeft size={18} /> BACK TO CATALOG
                 </button>
             </div>
 
@@ -138,7 +149,7 @@ export default function VehicleDetail() {
                     <div className="absolute bottom-0 left-0 w-full p-8 bg-gradient-to-t from-[#101014] to-transparent">
                         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                             <h1 className="text-5xl md:text-7xl horizon-title text-white tracking-widest drop-shadow-[0_0_15px_rgba(255,0,255,0.6)]">{vehicle.make} <span className="text-[#00FFFF]">{vehicle.model}</span></h1>
-                            <div className="text-3xl horizon-price mt-2">{String(vehicle.price_per_day).padStart(6, '0')} <span className="text-sm">CR / DAY</span></div>
+                            <div className="text-3xl horizon-price mt-2">₹ {String(vehicle.price_per_day).padStart(4, '0')} <span className="text-sm">/ DAY</span></div>
                         </div>
                     </div>
                 </motion.div>
@@ -204,9 +215,9 @@ export default function VehicleDetail() {
                     <div className="flex justify-between items-center py-6 border-y border-white/10 mt-4 mb-4">
                         <div>
                             <h2 className="text-2xl horizon-title text-white mb-1">
-                                TUNER: {vehicle.owner.name}
+                                HOST: {vehicle.owner.name}
                             </h2>
-                            <p className="text-[#00FFFF] font-bold uppercase tracking-widest text-xs py-1">FESTIVAL DRIVER • {vehicle.year} MODEL</p>
+                            <p className="text-[#00FFFF] font-bold uppercase tracking-widest text-xs py-1">CERTIFIED HOST • {vehicle.year} MODEL</p>
                         </div>
                         <div className="w-16 h-16 rounded-full border-2 border-[#FF00FF] bg-black/50 text-[#FF00FF] flex items-center justify-center text-2xl font-bold horizon-title shadow-[0_0_15px_rgba(255,0,255,0.4)]">
                             {vehicle.owner.name.charAt(0)}
@@ -215,13 +226,13 @@ export default function VehicleDetail() {
 
                     {/* Social Reviews */}
                     <div className="py-8">
-                        <h3 className="text-3xl horizon-title text-white mb-6 tracking-widest">HUB FEED</h3>
+                        <h3 className="text-3xl horizon-title text-white mb-6 tracking-widest">USER REVIEWS</h3>
 
                         {/* New Review Form */}
                         <form onSubmit={handleReviewSubmit} className="mb-10 border border-white/10 bg-white/5 backdrop-blur-xl p-6 rounded-xl">
-                            <h4 className="text-xl horizon-title text-[#00FFFF] mb-4">RATE EXPERIENCE</h4>
+                            <h4 className="text-xl horizon-title text-[#00FFFF] mb-4">LEAVE A REVIEW</h4>
                             <div className="flex items-center gap-2 mb-4">
-                                <span className="text-white/60 font-bold uppercase tracking-widest mr-4 text-xs">SKILL POINTS:</span>
+                                <span className="text-white/60 font-bold uppercase tracking-widest mr-4 text-xs">RATING:</span>
                                 {[1, 2, 3, 4, 5].map(star => (
                                     <Star
                                         key={star}
@@ -236,11 +247,11 @@ export default function VehicleDetail() {
                                 onChange={(e) => setReviewText(e.target.value)}
                                 className="w-full bg-black/30 border border-white/20 text-white p-4 rounded focus:outline-none focus:border-[#00FFFF] mb-4"
                                 rows="3"
-                                placeholder="HOW DID IT DRIVE?"
+                                placeholder="Write your thoughts..."
                                 required
                             ></textarea>
                             <button type="submit" disabled={submittingReview} className="horizon-btn w-full">
-                                <span>{submittingReview ? 'POSTING...' : 'POST UPDATE'}</span>
+                                <span>{submittingReview ? 'POSTING...' : 'SUBMIT REVIEW'}</span>
                             </button>
                         </form>
 
@@ -264,7 +275,7 @@ export default function VehicleDetail() {
                                     </div>
                                 ))
                             ) : (
-                                <p className="text-white/40 font-bold uppercase tracking-widest text-sm text-center py-8">NO ACTIVITY LOGGED FOR THIS VEHICLE YET.</p>
+                                <p className="text-white/40 font-bold uppercase tracking-widest text-sm text-center py-8">NO REVIEWS FOR THIS VEHICLE YET.</p>
                             )}
                         </div>
                     </div>
@@ -274,8 +285,9 @@ export default function VehicleDetail() {
                 <div className="lg:w-1/3">
                     <div className="sticky top-28 border border-white/10 bg-white/5 backdrop-blur-2xl p-6 rounded-2xl shadow-[0_15px_40px_rgba(0,0,0,0.6)]">
                         <div className="flex items-end mb-6">
-                            <span className="text-4xl horizon-price">{String(vehicle.price_per_day).padStart(6, '0')}</span>
-                            <span className="text-[#00FFFF] ml-2 mb-1 font-bold tracking-widest uppercase text-sm">CR / DAY</span>
+                            <span className="text-[#00FFFF] mr-1 mb-1 font-bold tracking-widest uppercase text-sm">₹</span>
+                            <span className="text-4xl horizon-price">{String(vehicle.price_per_day).padStart(4, '0')}</span>
+                            <span className="text-[#00FFFF] ml-2 mb-1 font-bold tracking-widest uppercase text-sm">/ DAY</span>
                         </div>
 
                         {error && (
@@ -314,28 +326,28 @@ export default function VehicleDetail() {
                             disabled={!startDate || !endDate || new Date(startDate) >= new Date(endDate) || bookingLoading}
                             className="horizon-btn w-full mt-4 !block"
                         >
-                            <span>{bookingLoading ? 'PROCESSING...' : 'ENTER EVENT'}</span>
+                            <span>{bookingLoading ? 'PROCESSING...' : 'REQUEST BOOKING'}</span>
                         </button>
-                        <p className="text-center text-white/40 font-medium text-xs uppercase mb-6 mt-4 tracking-widest">DRIVE IT NOW, PAY LATER</p>
+                        <p className="text-center text-white/40 font-medium text-xs mb-6 mt-4 tracking-widest">DRIVE IT NOW, PAY LATER</p>
 
                         {days > 0 && (
                             <div className="space-y-4 text-white/80 font-medium text-sm tracking-wider">
                                 <div className="flex justify-between">
-                                    <span>BASE PAYOUT x {days}D</span>
-                                    <span>{String(total).padStart(6, '0')} CR</span>
+                                    <span>BASE PRICE x {days}D</span>
+                                    <span>₹ {total}</span>
                                 </div>
                                 <div className="flex justify-between">
-                                    <span>FESTIVAL FEE</span>
-                                    <span>{String(800).padStart(6, '0')} CR</span>
+                                    <span>SERVICE FEE</span>
+                                    <span>₹ 800</span>
                                 </div>
                                 <div className="flex justify-between">
-                                    <span>TUNER CUT</span>
-                                    <span>{String(Math.round(total * 0.1)).padStart(6, '0')} CR</span>
+                                    <span>TAXES</span>
+                                    <span>₹ {Math.round(total * 0.1)}</span>
                                 </div>
 
                                 <div className="pt-4 border-t border-white/20 flex justify-between text-2xl horizon-title mt-4 text-white">
                                     <span>TOTAL</span>
-                                    <span className="text-[#00FFFF]">{String(total + 800 + Math.round(total * 0.1)).padStart(7, '0')} CR</span>
+                                    <span className="text-[#00FFFF]">₹ {(total + 800 + Math.round(total * 0.1))}</span>
                                 </div>
                             </div>
                         )}

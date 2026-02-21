@@ -48,7 +48,7 @@ export default function Explore() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
             {/* Header & Search */}
             <div className="mb-8 md:flex md:items-center md:justify-between space-y-4 md:space-y-0 border-b border-white/20 pb-4">
-                <h1 className="text-5xl horizon-title text-white drop-shadow-[0_0_15px_rgba(0,255,255,0.8)]">FESTIVAL AUTOSHOW</h1>
+                <h1 className="text-5xl horizon-title text-white drop-shadow-[0_0_15px_rgba(0,255,255,0.8)]">VEHICLE CATALOG</h1>
 
                 <div className="flex flex-col sm:flex-row gap-4">
                     <div className="relative border border-white/20 bg-white/5 backdrop-blur-md rounded focus-within:border-[#00FFFF]">
@@ -66,7 +66,7 @@ export default function Explore() {
 
                     <div className="flex items-center space-x-2 bg-white/5 backdrop-blur-md border border-white/20 px-3 py-2 rounded">
                         <SlidersHorizontal size={18} className="text-[#FF00FF]" />
-                        <span className="text-sm font-bold text-white whitespace-nowrap uppercase tracking-wider">MAX CR: {String(maxPrice).padStart(7, '0')}</span>
+                        <span className="text-sm font-bold text-white whitespace-nowrap uppercase tracking-wider">MAX: ₹{String(maxPrice).padStart(5, '0')}</span>
                         <input
                             type="range"
                             min="500"
@@ -103,12 +103,12 @@ export default function Explore() {
                         </div>
                     ) : (
                         <div className="text-center py-12 border border-white/20 bg-white/5 backdrop-blur-md rounded-lg">
-                            <p className="text-white font-bold tracking-widest text-lg uppercase">NO CARS FOUND FOR THIS CR TIER.</p>
+                            <p className="text-white font-bold tracking-widest text-lg uppercase">NO VEHICLES FOUND FOR THIS PRICE RANGE.</p>
                             <button
                                 onClick={() => { setSearchTerm(''); setMaxPrice(10000); }}
                                 className="mt-4 text-[#00FFFF] font-bold tracking-widest hover:text-[#FF00FF] horizon-title p-2 transition-all uppercase"
                             >
-                                SHOW ALL FESTIVAL CARS
+                                SHOW ALL VEHICLES
                             </button>
                         </div>
                     )}
@@ -128,7 +128,7 @@ export default function Explore() {
                                         <Popup className="horizon-popup">
                                             <Link to={`/vehicle/${v.id}`} className="block border border-white/20 bg-black/80 backdrop-blur-md p-2 rounded">
                                                 <strong className="block text-xl horizon-title text-white uppercase">{v.make} {v.model}</strong>
-                                                <span className="text-[#00FFFF] font-bold text-xl horizon-title tracking-widest">{String(v.price_per_day).padStart(6, '0')} CR</span>
+                                                <span className="text-[#00FFFF] font-bold text-xl horizon-title tracking-widest">₹ {String(v.price_per_day).padStart(4, '0')}</span>
                                                 <div className="mt-2 text-sm text-center bg-[#FF00FF] font-black tracking-widest text-white uppercase py-1 px-3 skew-x-[-10deg]">VIEW SPECS</div>
                                             </Link>
                                         </Popup>

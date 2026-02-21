@@ -1,0 +1,39 @@
+﻿node : file:///C:/Users/DELL/
+Desktop/Snap%20Vechicle/serve
+r/src/routes/upload.js:3
+At line:1 char:1
++ node index.js 2>&1 | 
+Out-File -Encoding utf8 
+error.txt
++ ~~~~~~~~~~~~~~~~~~
+    + CategoryInfo           
+   : NotSpecified: (file://  
+  /C:/User...tes/upload.js   
+ :3:String) [], RemoteExc    
+eption
+    + FullyQualifiedErrorId  
+   : NativeCommandError
+ 
+import { protect } from 
+'../middleware/auth.js';
+         ^^^^^^^
+SyntaxError: The requested 
+module 
+'../middleware/auth.js' does 
+not provide an export named 
+'protect'
+    at 
+ModuleJob._instantiate (node:
+internal/modules/esm/module_j
+ob:228:21)
+    at async ModuleJob.run (n
+ode:internal/modules/esm/modu
+le_job:337:5)
+    at async onImport.tracePr
+omise.__proto__ (node:interna
+l/modules/esm/loader:665:26)
+    at async asyncRunEntryPoi
+ntWithESMLoader (node:interna
+l/modules/run_main:117:5)
+
+Node.js v22.20.0
