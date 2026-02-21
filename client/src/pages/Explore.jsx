@@ -6,13 +6,18 @@ import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
 import { Link } from 'react-router-dom';
+import { parseImages } from '../utils/imageUtils';
+import toast from 'react-hot-toast';
 
-// Fix Leaflet's default icon path issues with Webpack/Vite
+import markerIcon2x from 'leaflet/dist/images/marker-icon-2x.png';
+import markerIcon from 'leaflet/dist/images/marker-icon.png';
+import markerShadow from 'leaflet/dist/images/marker-shadow.png';
+
 delete L.Icon.Default.prototype._getIconUrl;
 L.Icon.Default.mergeOptions({
-    iconRetinaUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon-2x.png',
-    iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png',
-    shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
+    iconRetinaUrl: markerIcon2x,
+    iconUrl: markerIcon,
+    shadowUrl: markerShadow,
 });
 
 export default function Explore() {
@@ -26,9 +31,13 @@ export default function Explore() {
         const fetchVehicles = async () => {
             try {
                 const { data } = await api.get('/vehicles');
-                setVehicles(data.data.vehicles);
+                const parsedData = data.data.vehicles.map(v => ({
+                    ...v,
+                    images: parseImages(v.images)
+                }));
+                setVehicles(parsedData);
             } catch (err) {
-                console.error('Error fetching vehicles:', err);
+                toast.error('Failed to load catalog');
             } finally {
                 setLoading(false);
             }
@@ -116,24 +125,22 @@ export default function Explore() {
 
                 {/* Map View */}
                 {showMap && (
-                    <div className="lg:w-1/2 h-[600px] sticky top-28 border border-white/20 shadow-[0_0_20px_rgba(0,255,255,0.2)] z-10 p-1 bg-white/5 backdrop-blur-md rounded-xl overflow-hidden">
+                    <div className="lg:w-1/2 h-[600px] sticky top-28 border border-white/20 shadow-[0_0_20px_rgba(0,255,255,0.2)] z-0 relative p-1 bg-white/5 backdrop-blur-md rounded-xl overflow-hidden">
                         <MapContainer center={kochiCenter} zoom={11} scrollWheelZoom={true} className="h-full w-full rounded-lg">
                             <TileLayer
                                 attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
                                 url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
                             />
-                            {filteredVehicles.map(v => (
-                                v.location_lat && v.location_lng && (
-                                    <Marker key={v.id} position={[v.location_lat, v.location_lng]}>
-                                        <Popup className="horizon-popup">
-                                            <Link to={`/vehicle/${v.id}`} className="block border border-white/20 bg-black/80 backdrop-blur-md p-2 rounded">
-                                                <strong className="block text-xl horizon-title text-white uppercase">{v.make} {v.model}</strong>
-                                                <span className="text-[#00FFFF] font-bold text-xl horizon-title tracking-widest">₹ {String(v.price_per_day).padStart(4, '0')}</span>
-                                                <div className="mt-2 text-sm text-center bg-[#FF00FF] font-black tracking-widest text-white uppercase py-1 px-3 skew-x-[-10deg]">VIEW SPECS</div>
-                                            </Link>
-                                        </Popup>
-                                    </Marker>
-                                )
+                            {filteredVehicles.filter(v => v.location_lat && v.location_lng).map(v => (
+                                <Marker key={v.id} position={[v.location_lat, v.location_lng]}>
+                                    <Popup className="horizon-popup">
+                                        <Link to={`/vehicle/${v.id}`} className="block border border-white/20 bg-black/80 backdrop-blur-md p-2 rounded">
+                                            <strong className="block text-xl horizon-title text-white uppercase">{v.make} {v.model}</strong>
+                                            <span className="text-[#00FFFF] font-bold text-xl horizon-title tracking-widest">₹ {String(v.price_per_day).padStart(4, '0')}</span>
+                                            <div className="mt-2 text-sm text-center bg-[#FF00FF] font-black tracking-widest text-white uppercase py-1 px-3 skew-x-[-10deg]">VIEW SPECS</div>
+                                        </Link>
+                                    </Popup>
+                                </Marker>
                             ))}
                         </MapContainer>
                     </div>

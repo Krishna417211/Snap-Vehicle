@@ -3,6 +3,8 @@ import api from '../utils/api';
 import { AuthContext } from '../contexts/AuthContext';
 import { Calendar, MapPin, IndianRupee } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
+import { parseImages } from '../utils/imageUtils';
+import toast from 'react-hot-toast';
 
 export default function Dashboard() {
     const [bookings, setBookings] = useState([]);
@@ -23,12 +25,12 @@ export default function Dashboard() {
                     ...b,
                     vehicle: {
                         ...b.vehicle,
-                        images: typeof b.vehicle.images === 'string' ? JSON.parse(b.vehicle.images) : b.vehicle.images
+                        images: parseImages(b.vehicle.images)
                     }
                 }));
                 setBookings(parsed);
             } catch (err) {
-                console.error(err);
+                toast.error('Failed to fetch bookings');
             } finally {
                 setLoading(false);
             }

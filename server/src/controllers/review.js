@@ -9,6 +9,11 @@ export const createReview = async (req, res, next) => {
             return next(new AppError('Missing required fields for review', 400));
         }
 
+        const vehicle = await prisma.vehicle.findUnique({ where: { id: parseInt(vehicle_id) } });
+        if (!vehicle) {
+            return next(new AppError('Vehicle not found', 404));
+        }
+
         const review = await prisma.review.create({
             data: {
                 vehicle_id: parseInt(vehicle_id),

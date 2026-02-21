@@ -1,6 +1,7 @@
 import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom';
 import { AuthProvider } from './contexts/AuthContext';
 import { AnimatePresence } from 'framer-motion';
+import { Toaster } from 'react-hot-toast';
 import Navbar from './components/Navbar';
 import Explore from './pages/Explore';
 import Login from './pages/Login';
@@ -33,6 +34,23 @@ function App() {
     <BrowserRouter>
       <AuthProvider>
         <div className="min-h-screen flex flex-col font-sans">
+          <Toaster position="bottom-right" toastOptions={{
+            style: {
+              background: 'rgba(15, 15, 20, 0.9)',
+              color: '#fff',
+              border: '1px solid rgba(255, 0, 255, 0.5)',
+              backdropFilter: 'blur(10px)',
+              fontFamily: '"Barlow Condensed", sans-serif',
+              textTransform: 'uppercase',
+              letterSpacing: '0.1em'
+            },
+            success: {
+              iconTheme: {
+                primary: '#00FFFF',
+                secondary: '#000'
+              }
+            }
+          }} />
           <Navbar />
           <main className="flex-grow">
             <AnimatedRoutes />

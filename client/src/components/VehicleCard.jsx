@@ -2,10 +2,12 @@ import { Link } from 'react-router-dom';
 import { MapPin, IndianRupee } from 'lucide-react';
 import { motion } from 'framer-motion';
 
+import { parseImages } from '../utils/imageUtils';
+
 export default function VehicleCard({ vehicle }) {
-    // Parse images if stored as JSON string
-    const images = typeof vehicle.images === 'string' ? JSON.parse(vehicle.images) : vehicle.images;
-    const mainImage = images && images.length > 0 ? images[0] : null;
+    // Parse images safely
+    const images = parseImages(vehicle.images);
+    const mainImage = images.length > 0 ? images[0] : null;
 
     // Fake the Horizon stats
     const piScore = Math.min(999, Math.floor(vehicle.price_per_day / 2) + 500);

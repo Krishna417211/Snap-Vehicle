@@ -20,6 +20,10 @@ export const createBooking = async (req, res, next) => {
         const vehicle = await prisma.vehicle.findUnique({ where: { id: parseInt(vehicle_id) } });
         if (!vehicle) return next(new AppError('Vehicle not found', 404));
 
+        if (vehicle.owner_id === req.user.id) {
+            return next(new AppError('Hosts cannot book their own vehicles', 403));
+        }
+
         // Overlap Validation
         const overlappingBookings = await prisma.booking.findMany({
             where: {

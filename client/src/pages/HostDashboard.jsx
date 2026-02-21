@@ -5,6 +5,8 @@ import { Car, PlusCircle, Activity } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { io } from 'socket.io-client';
 import { motion, AnimatePresence } from 'framer-motion';
+import { parseImages } from '../utils/imageUtils';
+import toast from 'react-hot-toast';
 
 export default function HostDashboard() {
     const [vehicles, setVehicles] = useState([]);
@@ -30,11 +32,11 @@ export default function HostDashboard() {
                 const { data } = await api.get('/vehicles/host');
                 const parsed = data.data.vehicles.map(v => ({
                     ...v,
-                    images: typeof v.images === 'string' ? JSON.parse(v.images) : v.images
+                    images: parseImages(v.images)
                 }));
                 setVehicles(parsed);
             } catch (err) {
-                console.error(err);
+                toast.error('Failed to fetch vehicles');
             } finally {
                 setLoading(false);
             }
@@ -77,12 +79,13 @@ export default function HostDashboard() {
             };
             const { data } = await api.post('/vehicles', payload);
             const newV = data.data.vehicle;
-            newV.images = typeof newV.images === 'string' ? JSON.parse(newV.images) : newV.images;
+            newV.images = parseImages(newV.images);
             setVehicles([...vehicles, newV]);
             setShowAddForm(false);
             setFormData({ make: '', model: '', year: '', price_per_day: '', description: '', location_lat: 9.9312, location_lng: 76.2673, imageFile: null });
+            toast.success('Vehicle added successfully!');
         } catch (err) {
-            alert(err.response?.data?.message || 'Failed to add vehicle');
+            toast.error(err.response?.data?.message || 'Failed to add vehicle');
         } finally {
             setUploadingImage(false);
         }

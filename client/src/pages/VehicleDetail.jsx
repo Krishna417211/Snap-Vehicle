@@ -4,6 +4,8 @@ import api from '../utils/api';
 import { AuthContext } from '../contexts/AuthContext';
 import { Calendar, MapPin, Search, Star, MessageSquare, ArrowLeft } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import toast from 'react-hot-toast';
+import { parseImages } from '../utils/imageUtils';
 
 export default function VehicleDetail() {
     const { id } = useParams();
@@ -26,7 +28,7 @@ export default function VehicleDetail() {
             try {
                 const { data } = await api.get(`/vehicles/${id}`);
                 const v = data.data.vehicle;
-                v.images = typeof v.images === 'string' ? JSON.parse(v.images) : v.images;
+                v.images = parseImages(v.images);
                 setVehicle(v);
             } catch (err) {
                 setError('Vehicle not found.');
@@ -102,8 +104,9 @@ export default function VehicleDetail() {
             });
             setReviewText('');
             setReviewRating(5);
+            toast.success('Review posted successfully!');
         } catch (err) {
-            alert('Failed to submit review');
+            toast.error(err.response?.data?.message || 'Failed to submit review');
         } finally {
             setSubmittingReview(false);
         }
@@ -250,7 +253,7 @@ export default function VehicleDetail() {
                                 placeholder="Write your thoughts..."
                                 required
                             ></textarea>
-                            <button type="submit" disabled={submittingReview} className="horizon-btn w-full">
+                            <button type="submit" disabled={submittingReview} className="horizon-btn w-full !block">
                                 <span>{submittingReview ? 'POSTING...' : 'SUBMIT REVIEW'}</span>
                             </button>
                         </form>

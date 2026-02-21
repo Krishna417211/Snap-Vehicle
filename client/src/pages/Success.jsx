@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useSearchParams, useNavigate, Link } from 'react-router-dom';
 import { CheckCircle, Loader2 } from 'lucide-react';
 import api from '../utils/api';
+import toast from 'react-hot-toast';
 
 export default function Success() {
     const [searchParams] = useSearchParams();
@@ -25,7 +26,7 @@ export default function Success() {
                 });
                 setStatus('success');
             } catch (err) {
-                console.error(err);
+                toast.error('Verification error: ' + (err.response?.data?.message || err.message));
                 setStatus('error');
             }
         };
