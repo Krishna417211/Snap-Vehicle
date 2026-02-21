@@ -1,0 +1,65 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+// Emulate enums as SQLite does not support enums
+// Role: USER, HOST
+// BookingStatus: PENDING, CONFIRMED
+
+model User {
+  id         Int       @id @default(autoincrement())
+  email      String    @unique
+  password   String
+  name       String
+  role       String    @default("USER")
+  created_at DateTime  @default(now())
+  vehicles   Vehicle[]
+  bookings   Booking[]
+  reviews    Review[]
+}
+
+model Vehicle {
+  id            Int       @id @default(autoincrement())
+  owner_id      Int
+  owner         User      @relation(fields: [owner_id], references: [id])
+  make          String
+  model         String
+  year          Int
+  price_per_day Float
+  location_lat  Float
+  location_lng  Float
+  images        String    // Storing JSON string for SQLite array fallback
+  description   String
+  created_at    DateTime  @default(now())
+  bookings      Booking[]
+  reviews       Review[]
+}
+
+model Booking {
+  id          Int       @id @default(autoincrement())
+  user_id     Int
+  vehicle_id  Int
+  user        User      @relation(fields: [user_id], references: [id])
+  vehicle     Vehicle   @relation(fields: [vehicle_id], references: [id])
+  start_date  DateTime
+  end_date    DateTime
+  total_price Float
+  status      String    @default("PENDING")
+  created_at  DateTime  @default(now())
+}
+
+model Review {
+  id          Int       @id @default(autoincrement())
+  user_id     Int
+  vehicle_id  Int
+  user        User      @relation(fields: [user_id], references: [id])
+  vehicle     Vehicle   @relation(fields: [vehicle_id], references: [id])
+  rating      Int
+  comment     String
+  created_at  DateTime  @default(now())
+}

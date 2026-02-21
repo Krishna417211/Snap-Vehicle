@@ -1,0 +1,127 @@
+@import url('https://fonts.googleapis.com/css2?family=Barlow+Condensed:ital,wght@1,700;1,900&family=Inter:wght@400;600;900&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --font-horizon: 'Barlow Condensed', 'Inter', sans-serif;
+  --font-body: 'Inter', sans-serif;
+
+  --color-horizon-pink: #FF00FF;
+  --color-horizon-cyan: #00FFFF;
+  --color-horizon-dark: rgba(15, 15, 20, 0.85);
+  /* Glassmorphism base */
+  --color-horizon-white: rgba(255, 255, 255, 0.9);
+  --color-horizon-card: rgba(255, 255, 255, 0.05);
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  font-family: var(--font-body);
+  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+  background-attachment: fixed;
+  color: white;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+.horizon-title {
+  font-family: var(--font-horizon);
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  font-style: italic;
+}
+
+/* Base Horizon Styles */
+.horizon-card {
+  background-color: var(--color-horizon-card);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  overflow: hidden;
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+.horizon-card:hover {
+  transform: translate(-2px, -2px) scale(1.03) rotate(-1deg);
+  border-color: var(--color-horizon-pink);
+  box-shadow: 0 10px 30px -10px rgba(255, 0, 255, 0.4);
+}
+
+.horizon-btn {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  color: white;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  transform: skewX(-15deg);
+  text-transform: uppercase;
+  font-family: var(--font-horizon);
+  font-style: italic;
+  font-size: 1.25rem;
+  letter-spacing: 2px;
+  padding: 0.5rem 2rem;
+  transition: all 0.2s ease-out;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  position: relative;
+}
+
+.horizon-btn>span,
+.horizon-btn>svg {
+  transform: skewX(15deg);
+  /* Un-skew the content */
+}
+
+.horizon-btn:hover {
+  background: var(--color-horizon-pink);
+  color: white;
+  border-color: var(--color-horizon-pink);
+  box-shadow: 0 0 15px var(--color-horizon-pink);
+}
+
+.horizon-price {
+  font-family: var(--font-horizon);
+  color: white;
+  font-style: italic;
+  font-size: 1.5rem;
+  letter-spacing: 1px;
+}
+
+.horizon-success {
+  font-family: var(--font-horizon);
+  font-style: italic;
+  color: var(--color-horizon-cyan);
+  text-transform: uppercase;
+  text-shadow: 0 0 10px var(--color-horizon-cyan);
+  letter-spacing: 2px;
+}
+
+.horizon-input {
+  background-color: rgba(0, 0, 0, 0.3);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: white;
+  padding: 0.75rem 1rem;
+  border-radius: 4px;
+  transition: all 0.2s;
+}
+
+.horizon-input:focus {
+  outline: none;
+  border-color: var(--color-horizon-cyan);
+  box-shadow: 0 0 10px rgba(0, 255, 255, 0.3);
+}
+
+/* Map specific overrides */
+.leaflet-container {
+  border-radius: 12px;
+}

@@ -1,0 +1,33 @@
+﻿node.exe : Loaded Prisma 
+config from prisma.config.ts.
+At line:1 char:1
++ & "C:\Program 
+Files\nodejs/node.exe" "C:\Us
+ers\DELL\AppData\Roaming\n 
+...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~
+    + CategoryInfo           
+   : NotSpecified: (Loaded   
+  Prisma c...isma.config.t   
+ s.:String) [], RemoteExc    
+eption
+    + FullyQualifiedErrorId  
+   : NativeCommandError
+ 
+
+Prisma schema loaded from 
+prisma\schema.prisma.
+Datasource "db": PostgreSQL database "swiftrent", schema "public" at "localhost:5432"
+
+Error: P1000: Authentication 
+failed against database 
+server, the provided 
+database credentials for 
+`postgres` are not valid.
+
+Please make sure to provide 
+valid database credentials 
+for the database server at 
+the configured address.

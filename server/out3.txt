@@ -1,0 +1,50 @@
+﻿node : file:///C:/Users/DELL/
+Desktop/Snap%20Vechicle/serve
+r/prisma/seed.js:1
+At line:1 char:1
++ node prisma/seed.js 2>&1 | 
+Out-File out3.txt -Encoding 
+utf8
++ ~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo           
+   : NotSpecified: (file://  
+  /C:/User...risma/seed.js   
+ :1:String) [], RemoteExc    
+eption
+    + FullyQualifiedErrorId  
+   : NativeCommandError
+ 
+import { PrismaClient } from 
+'@prisma/client';
+         ^^^^^^^^^^^^
+SyntaxError: Named export 
+'PrismaClient' not found. 
+The requested module 
+'@prisma/client' is a 
+CommonJS module, which may 
+not support all 
+module.exports as named 
+exports.
+CommonJS modules can always 
+be imported via the default 
+export, for example using:
+
+import pkg from 
+'@prisma/client';
+const { PrismaClient } = pkg;
+
+    at 
+ModuleJob._instantiate (node:
+internal/modules/esm/module_j
+ob:228:21)
+    at async ModuleJob.run (n
+ode:internal/modules/esm/modu
+le_job:337:5)
+    at async onImport.tracePr
+omise.__proto__ (node:interna
+l/modules/esm/loader:665:26)
+    at async asyncRunEntryPoi
+ntWithESMLoader (node:interna
+l/modules/run_main:117:5)
+
+Node.js v22.20.0

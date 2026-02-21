@@ -1,0 +1,208 @@
+﻿node : 
+C:\Users\DELL\Desktop\Snap Ve
+chicle\server\node_modules\@p
+risma\client\runtime\client.j
+s:70
+At line:1 char:1
++ node prisma/seed.js 2>&1 | 
+Out-File out5.txt -Encoding 
+utf8
++ ~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo           
+   : NotSpecified: (C:\User  
+  s\DELL\D...me\client.js:   
+ 70:String) [], RemoteExc    
+eption
+    + FullyQualifiedErrorId  
+   : NativeCommandError
+ 
+${n}`}var jl=require("@prisma
+/client-runtime-utils");funct
+ion Ul(e){return e.length===0
+?Promise.resolve([]):new 
+Promise((t,r)=>{let n=new Arr
+ay(e.length),i=null,o=!1,s=0,
+a=()=>{o||(s++,s===e.length&&
+(o=!0,i?r(i):t(n)))},l=u=>{o|
+|(o=!0,r(u))};for(let u=0;u<e
+.length;u++)e[u].then(c=>{n[u
+]=c,a()},c=>{if(!(0,jl.hasBat
+chIndex)(c)){l(c);return}c.ba
+tchRequestIdx===u?l(c):(i||(i
+=c),a())})})}var 
+Ut=M("prisma:client");typeof 
+globalThis=="object"&&(global
+This.NODE_CLIENT=!0);var Rm={
+requestArgsToMiddlewareArgs:e
+=>e,middlewareArgsToRequestAr
+gs:e=>e},km=Symbol.for("prism
+a.client.transaction.id"),Im=
+{id:0,nextId(){return++this.i
+d}};function Gl(e){class t{_o
+riginalClient=this;_runtimeDa
+taModel;_requestHandler;_conn
+ectionPromise;_disconnectionP
+romise;_engineConfig;_acceler
+ateEngineConfig;_clientVersio
+n;_errorFormat;_tracingHelper
+;_previewFeatures;_activeProv
+ider;_globalOmit;_extensions;
+_engine;_appliedParent;_creat
+ePrismaPromise=pi();construct
+or(n){if(!n)throw new w.Prism
+aClientInitializationError("`
+PrismaClient` needs to be 
+constructed with a 
+non-empty, valid `PrismaClien
+tOptions`:\n\n```\nnew 
+PrismaClient({\n  ...\n})\n``
+`\n\nor\n\n```\nconstructor()
+ {\n  super({ ... 
+});\n}\n```\n          ",yi);
+e=n.__internal?.configOverrid
+e?.(e)??e,ql(n,e);let i=new H
+l.EventEmitter().on("error",(
+)=>{});this._extensions=Ue.em
+pty(),this._previewFeatures=e
+.previewFeatures,this._client
+Version=e.clientVersion??yi,t
+his._activeProvider=e.activeP
+rovider,this._globalOmit=n?.o
+mit,this._tracingHelper=Rl();
+let o;if(n.adapter){o=n.adapt
+er;let s=e.activeProvider==="
+postgresql"||e.activeProvider
+==="cockroachdb"?"postgres":e
+.activeProvider;if(o.provider
+!==s)throw new w.PrismaClient
+InitializationError(`The 
+Driver Adapter 
+\`${o.adapterName}\`, based 
+on \`${o.provider}\`, is not 
+compatible with the provider 
+\`${s}\` specified in the 
+Prisma schema.`,this._clientV
+ersion)}try{let s=n??{},l=(s.
+__internal??{}).debug===!0;if
+(l&&M.enable("prisma:client")
+,s.errorFormat?this._errorFor
+mat=s.errorFormat:process.env
+.NODE_ENV==="production"?this
+._errorFormat="minimal":proce
+ss.env.NO_COLOR?this._errorFo
+rmat="colorless":this._errorF
+ormat="colorless",this._runti
+meDataModel=e.runtimeDataMode
+l,this._engineConfig={enableD
+ebugLogs:l,logLevel:s.log&&Il
+(s.log),logQueries:s.log&&!!(
+typeof s.log=="string"?s.log=
+=="query":s.log.find(u=>typeo
+f u=="string"?u==="query":u.l
+evel==="query")),compilerWasm
+:e.compilerWasm,clientVersion
+:e.clientVersion,previewFeatu
+res:this._previewFeatures,act
+iveProvider:e.activeProvider,
+inlineSchema:e.inlineSchema,t
+racingHelper:this._tracingHel
+per,transactionOptions:{maxWa
+it:s.transactionOptions?.maxW
+ait??2e3,timeout:s.transactio
+nOptions?.timeout??5e3,isolat
+ionLevel:s.transactionOptions
+?.isolationLevel},logEmitter:
+i,adapter:o,accelerateUrl:s.a
+ccelerateUrl,sqlCommenters:s.
+comments,parameterizationSche
+ma:e.parameterizationSchema,r
+untimeDataModel:e.runtimeData
+Model},this._accelerateEngine
+Config=Object.create(this._en
+gineConfig),this._accelerateE
+ngineConfig.accelerateUtils={
+resolveDatasourceUrl:()=>{if(
+s.accelerateUrl)return 
+s.accelerateUrl;throw new w.P
+rismaClientInitializationErro
+r(`\`accelerateUrl\` is 
+required when using \`@prisma
+/extension-accelerate\`:
+                             
+                             
+                             
+                             
+                             
+                             
+                             
+                             
+                             
+                             
+                             
+                             
+                             
+                             
+                             
+                             
+                             
+                             
+                             
+                             
+                             
+                             
+                             
+                             
+                             
+                             
+                             
+                             
+                             
+                             
+                             
+                             
+                             
+  ^
+
+PrismaClientInitializationErr
+or: `PrismaClient` needs to 
+be constructed with a 
+non-empty, valid 
+`PrismaClientOptions`:
+
+```
+new PrismaClient({
+  ...
+})
+```
+
+or
+
+```
+constructor() {
+  super({ ... });
+}
+```
+          
+    at new t 
+(C:\Users\DELL\Desktop\Snap V
+echicle\server\node_modules\@
+prisma\client\runtime\client.
+js:70:960)
+    at file:///C:/Users/DELL/
+Desktop/Snap%20Vechicle/serve
+r/prisma/seed.js:4:16
+    at ModuleJob.run (node:in
+ternal/modules/esm/module_job
+:345:25)
+    at async onImport.tracePr
+omise.__proto__ (node:interna
+l/modules/esm/loader:665:26)
+    at async asyncRunEntryPoi
+ntWithESMLoader (node:interna
+l/modules/run_main:117:5) {
+  clientVersion: '7.4.1',
+  errorCode: undefined,
+  retryable: undefined
+}
+
+Node.js v22.20.0

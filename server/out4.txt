@@ -1,0 +1,39 @@
+﻿node : file:///C:/Users/DELL/
+Desktop/Snap%20Vechicle/serve
+r/prisma/seed.js:2
+At line:1 char:1
++ node prisma/seed.js 2>&1 | 
+Out-File out4.txt -Encoding 
+utf8
++ ~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo           
+   : NotSpecified: (file://  
+  /C:/User...risma/seed.js   
+ :2:String) [], RemoteExc    
+eption
+    + FullyQualifiedErrorId  
+   : NativeCommandError
+ 
+import { PrismaLibSQL } from 
+'@prisma/adapter-libsql';
+         ^^^^^^^^^^^^
+SyntaxError: The requested 
+module 
+'@prisma/adapter-libsql' 
+does not provide an export 
+named 'PrismaLibSQL'
+    at 
+ModuleJob._instantiate (node:
+internal/modules/esm/module_j
+ob:228:21)
+    at async ModuleJob.run (n
+ode:internal/modules/esm/modu
+le_job:337:5)
+    at async onImport.tracePr
+omise.__proto__ (node:interna
+l/modules/esm/loader:665:26)
+    at async asyncRunEntryPoi
+ntWithESMLoader (node:interna
+l/modules/run_main:117:5)
+
+Node.js v22.20.0
