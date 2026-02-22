@@ -1,5 +1,5 @@
 export const parseImages = (imagesData) => {
-    const DEFAULT_IMAGE = "https://images.unsplash.com/photo-1541348263662-e06836264be8?q=80&w=2000&auto=format&fit=crop";
+    const DEFAULT_IMAGE = "/cars/kia seltos.png";
     if (!imagesData) return [DEFAULT_IMAGE];
 
     if (Array.isArray(imagesData)) {
