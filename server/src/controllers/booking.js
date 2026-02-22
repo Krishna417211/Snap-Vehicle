@@ -28,7 +28,9 @@ export const createBooking = async (req, res, next) => {
         const overlappingBookings = await prisma.booking.findMany({
             where: {
                 vehicle_id: parseInt(vehicle_id),
-                status: 'CONFIRMED',
+                status: {
+                    in: ['CONFIRMED', 'PENDING']
+                },
                 start_date: {
                     lte: end,
                 },
@@ -39,7 +41,7 @@ export const createBooking = async (req, res, next) => {
         });
 
         if (overlappingBookings.length > 0) {
-            return next(new AppError('VEHICLE ALREADY RESERVED.', 400));
+            return next(new AppError('VEHICLE UNAVAILABLE FOR THESE DATES', 400));
         }
 
         // Calculate days and total price
