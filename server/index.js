@@ -33,15 +33,11 @@ const io = new Server(server, {
 app.set('io', io);
 
 io.on('connection', (socket) => {
-    console.log('User connected to live dashboard:', socket.id);
-
     socket.on('join_host_room', (hostId) => {
         socket.join(hostId.toString());
-        console.log(`Host ${hostId} joined their alert room`);
     });
 
     socket.on('disconnect', () => {
-        console.log('User disconnected:', socket.id);
     });
 });
 const PORT = process.env.PORT || 5000;

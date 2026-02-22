@@ -329,7 +329,7 @@ export default function VehicleDetail() {
                             disabled={!startDate || !endDate || new Date(startDate) >= new Date(endDate) || bookingLoading}
                             className="horizon-btn w-full mt-4 !block"
                         >
-                            <span>{bookingLoading ? 'PROCESSING...' : 'REQUEST BOOKING'}</span>
+                            <span>{bookingLoading ? 'PROCESSING...' : 'ENTER EVENT'}</span>
                         </button>
                         <p className="text-center text-white/40 font-medium text-xs mb-6 mt-4 tracking-widest">DRIVE IT NOW, PAY LATER</p>
 

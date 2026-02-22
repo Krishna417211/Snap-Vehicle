@@ -18,7 +18,7 @@ export default function HostDashboard() {
     const navigate = useNavigate();
 
     const [formData, setFormData] = useState({
-        make: '', model: '', year: '', price_per_day: '', description: '', location_lat: 9.9312, location_lng: 76.2673, imageFile: null
+        make: '', model: '', year: '', price_per_day: '', description: '', location_lat: 9.9312, location_lng: 76.2673, imageFiles: []
     });
 
     useEffect(() => {
@@ -62,27 +62,29 @@ export default function HostDashboard() {
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            let uploadedUrl = '';
-            if (formData.imageFile) {
+            let uploadedUrls = [];
+            if (formData.imageFiles && formData.imageFiles.length > 0) {
                 setUploadingImage(true);
                 const uploadData = new FormData();
-                uploadData.append('image', formData.imageFile);
+                Array.from(formData.imageFiles).forEach(file => {
+                    uploadData.append('images', file);
+                });
                 const uploadRes = await api.post('/upload', uploadData, {
                     headers: { 'Content-Type': 'multipart/form-data' }
                 });
-                uploadedUrl = uploadRes.data.data.url;
+                uploadedUrls = uploadRes.data.data.urls || [];
             }
 
             const payload = {
                 ...formData,
-                images: uploadedUrl ? [uploadedUrl] : []
+                images: uploadedUrls
             };
             const { data } = await api.post('/vehicles', payload);
             const newV = data.data.vehicle;
             newV.images = parseImages(newV.images);
             setVehicles([...vehicles, newV]);
             setShowAddForm(false);
-            setFormData({ make: '', model: '', year: '', price_per_day: '', description: '', location_lat: 9.9312, location_lng: 76.2673, imageFile: null });
+            setFormData({ make: '', model: '', year: '', price_per_day: '', description: '', location_lat: 9.9312, location_lng: 76.2673, imageFiles: [] });
             toast.success('Vehicle added successfully!');
         } catch (err) {
             toast.error(err.response?.data?.message || 'Failed to add vehicle');
@@ -145,8 +147,8 @@ export default function HostDashboard() {
                             <input type="number" required placeholder="1200" value={formData.price_per_day} onChange={e => setFormData({ ...formData, price_per_day: e.target.value })} className="horizon-input w-full" />
                         </div>
                         <div className="col-span-2">
-                            <label className="block text-sm font-bold text-white/50 mb-1 uppercase tracking-widest">UPLOAD VEHICLE IMAGE</label>
-                            <input type="file" accept="image/*" onChange={e => setFormData({ ...formData, imageFile: e.target.files[0] })} className="w-full text-white file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-bold file:bg-[#FF00FF] file:text-white hover:file:bg-[#00FFFF] hover:file:text-black transition-all cursor-pointer" />
+                            <label className="block text-sm font-bold text-white/50 mb-1 uppercase tracking-widest">UPLOAD VEHICLE IMAGES</label>
+                            <input multiple type="file" accept="image/*" onChange={e => setFormData({ ...formData, imageFiles: e.target.files })} className="w-full text-white file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-bold file:bg-[#FF00FF] file:text-white hover:file:bg-[#00FFFF] hover:file:text-black transition-all cursor-pointer" />
                         </div>
                         <div className="col-span-2">
                             <label className="block text-sm font-bold text-white/50 mb-1 uppercase tracking-widest">DESCRIPTION</label>

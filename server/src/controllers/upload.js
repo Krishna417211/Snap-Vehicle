@@ -3,21 +3,20 @@ import { AppError } from '../middleware/errorHandler.js';
 
 export const uploadImage = async (req, res, next) => {
     try {
-        if (!req.file) {
+        if (!req.files || req.files.length === 0) {
             return next(new AppError('No image provided', 400));
         }
 
-        // Return the local static file path instead of uploading to Cloudinary
-        const localUrl = `http://localhost:5000/uploads/${req.file.filename}`;
+        const localUrls = req.files.map(file => `http://localhost:5000/uploads/${file.filename}`);
 
         res.status(200).json({
             status: 'success',
             data: {
-                url: localUrl
+                urls: localUrls
             }
         });
     } catch (error) {
-        if (req.file) fs.unlinkSync(req.file.path);
+        if (req.files) req.files.forEach(f => fs.unlinkSync(f.path));
         next(new AppError('Failed to upload image', 500));
     }
 };

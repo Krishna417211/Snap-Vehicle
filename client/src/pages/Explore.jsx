@@ -111,9 +111,9 @@ export default function Explore() {
                             <p className="text-white font-bold tracking-widest text-lg uppercase">NO VEHICLES FOUND FOR THIS PRICE RANGE.</p>
                             <button
                                 onClick={() => { setSearchTerm(''); setMaxPrice(10000); }}
-                                className="mt-4 text-[#00FFFF] font-bold tracking-widest hover:text-[#FF00FF] horizon-title p-2 transition-all uppercase"
+                                className="horizon-btn mt-4"
                             >
-                                SHOW ALL VEHICLES
+                                <span>SHOW ALL VEHICLES</span>
                             </button>
                         </div>
                     )}
